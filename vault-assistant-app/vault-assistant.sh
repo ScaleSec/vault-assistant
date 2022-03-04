@@ -124,10 +124,14 @@ show_vault_status () {
     echo "| API:         http://127.0.0.1:8200/v1/"
     echo "| UI:          http://127.0.0.1:8200/ui/"
     echo "| Audit Log:   $VAULT_ROOT/vault-audit.log"
+    echo "| Custom Plugins: $(get_custom_plugins)"
     echo "+---------------------------------------------------------------------"
     echo ""$COLOR_OFF
 }
-
+get_custom_plugins () {
+    PLUGINS=`ls ~/vault/custom_plugin`
+    echo "~/vault/custom_plugin : ${PLUGINS}"
+}
 start_vault () {
     if [[ $(get_vault_status) = "Stopped" ]]; then
         vault server -config=$VAULT_ROOT/config.hcl &
@@ -153,6 +157,16 @@ stop_vault () {
     else 
         echo "vault is already stopped"
     fi
+
+    stop_custom_plugin_processes
+}
+
+stop_custom_plugin_processes() {
+    PROCESS_IDS=$(ps -ef | grep 'vault/custom_plugin' | awk '{print $2}')
+    for PROCESS_ID in PROCESS_IDS
+    do
+        kill -9 $PROCESS_ID
+    done
 }
 
 vault_seal () {
