@@ -44,7 +44,7 @@ VAULT_ROOT=~/vault
 # $VAULT_ROOT/config.hcl       # Directory and configuration file for vault
 # $VAULT_ROOT/local-root-token # Directory and file to store local root token
 # $VAULT_ROOT/local-unseal-key # Directory and file to store local unseal token
-# $VAULT_ROOT/custom_plugin    # Directory for custome vault plugins 
+# $VAULT_ROOT/custom_plugin    # Directory for custom vault plugins 
 
 # FUTURE:  Chang the local-root-token and local-unseal-key to interaface
 # with 1password command line tool
