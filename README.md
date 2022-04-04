@@ -3,6 +3,8 @@
 # vault-assistant
 Vault assistant is a quick and easy way to install, configure and run Hashicorp Vault.  It provides a dock application to start; stop; seal; unseal and other support functions.
 
+<img src="./images/vault-assistant.png" style="width:500px;height:500px;align:center">
+
 **vault-install.sh:** Run this shell script to download and install the current version of Vault.  It will setup and configure vault and install the ScaleSec Vault Assistant  
 
 **vault-assistant-install.sh:** Run this shell script if you want to reinstall the ScaleSec Vault Assistant.
