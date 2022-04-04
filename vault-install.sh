@@ -40,7 +40,7 @@ REQUESTED_VERSION=$1
 
 # Vault configuration files will be created at VAULT_ROOT
 VAULT_ROOT=~/vault  
-# $VAULT_ROOT/data             # Directory location will vault is store data
+# $VAULT_ROOT/data             # Directory location where vault will its store data
 # $VAULT_ROOT/config.hcl       # Directory and configuration file for vault
 # $VAULT_ROOT/local-root-token # Directory and file to store local root token
 # $VAULT_ROOT/local-unseal-key # Directory and file to store local unseal token
@@ -100,7 +100,7 @@ echo "config.hcl"
 cat $VAULT_ROOT/config.hcl
 }
 
-# Set the version of vault to the reqeusted or the most current version of open source
+# get the version of vault reqeusted or the most current version of open source
 set_vault_version () {
     if [[ -z $REQUESTED_VERSION ]]; then
         VERSION_LINE=`curl https://releases.hashicorp.com/vault/ | awk 'NR==67' | sed 's/+ent//'`
@@ -114,14 +114,14 @@ set_vault_version () {
     echo "VAULT_VERSION=$VAULT_VERSION"
 }
 
-download_vault () {
+download_vault () { # download the current version of vault
     export VAULT_ZIP_NAME="vault_"$VAULT_VERSION"_darwin_amd64.zip"
     if [[ ! -f ~/Downloads/$VAULT_ZIP_NAME ]]; then
         curl -o ~/Downloads/$VAULT_ZIP_NAME -k "https://releases.hashicorp.com/vault/"$VAULT_VERSION"/"$VAULT_ZIP_NAME
     fi
 }
 
-install_vault () {
+install_vault () { # Install vault
     if [[ ! -d /usr/local/vault ]]; then
         mkdir /usr/local/vault
     fi
@@ -149,7 +149,7 @@ install_vault () {
 
 }
 
-start_and_init_vault () {
+start_and_init_vault () { # Initilizse and start vault
 
     vault server -config=$VAULT_ROOT/config.hcl &
     sleep 5s
@@ -168,7 +168,7 @@ start_and_init_vault () {
     vault audit enable file file_path=$VAULT_ROOT/vault-audit.log log_raw=true
 }
 
-setup_user_profile () {
+setup_user_profile () { # setup the users profile file 
     if [[ ! -e ~/$PROFILE_FILE ]]; then
         touch ~/$PROFILE_FILE
     fi
@@ -186,11 +186,11 @@ setup_user_profile () {
     source ~/$PROFILE_FILE
 }
 
-install_vault_assistant () {
+install_vault_assistant () { # Install the ScaleSec Vault Assistant
     ./vault_assistant_install.sh
 }
 
-stop_vault () {
+stop_vault () { # stop vault if it is running.
     PROCESS_ID=$(ps -ef | grep '[v]ault server' | awk '{print $2}')
     if [[ ! -z $PROCESS_ID ]]; then
         kill -9 $PROCESS_ID

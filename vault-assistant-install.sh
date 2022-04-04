@@ -11,9 +11,9 @@
 #
 # to change the app
 # 1. unzip
-# 2. open .app file with automater app
+# 2. open .app file with automator app
 # 3. save
-# 4. copy the vault-assistatn-icon.icns to the .app directoy /Contents/Resources as ApplicationStub.icns
+# 4. copy the vault-assistant-icon.icns to the .app directoy /Contents/Resources as ApplicationStub.icns
 # 5. compess the .app for deployment as the new version
 #
 # adding a run apple script works to set the size but BigSir will not let me save
