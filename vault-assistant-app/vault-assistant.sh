@@ -11,7 +11,6 @@
 #---------------------------------------------------
 #!/bin/zsh
 
-#debug
 #set -vx
 
 export VAULT_ASSISTANT_VERSION="0.0.1"
@@ -58,19 +57,16 @@ show_menu () { # displays menu
     echo " "
 
     read -p "Enter menu option S, X, L, U, I, D, H, Q, or E: " SELECTION_FROM_MENU
-    # read sometimes give an error on mac osx 11  some other options
-    #vared -p "Enter menu option S, X, L, U, I, D, H, Q, or E: " -c SELECTION_FROM_MENU
-    #echo "Enter menu option S, X, L, U, I, D, H, Q, or E: "; read SELECTION_FROM_MENU
 
     export SELECTION_FROM_MENU
 
 }
 
-get_vault_version () {
+get_vault_version () { # Get the version of vault that is installed
     echo `vault --version`
 }
 
-get_vault_status () {
+get_vault_status () { # Determine if vault is running or stopped
     if [[ `ps -ef | grep "vault/config.hcl" | grep -v grep` = "" ]]; then
         echo "Stopped"
    else
@@ -78,7 +74,7 @@ get_vault_status () {
    fi
 }
 
-get_vault_seal_status () {
+get_vault_seal_status () { # Determine if vault is sealed (locked) or unsealed (un-locked)
     if [[ $(get_vault_status) = "Running" ]]; then
         UNSEAL_STATUS=$(vault status | awk '/^Sealed/' | tr -s ' ' | cut -d ' ' -f2)
         if [[ $UNSEAL_STATUS = "false" ]]; then
@@ -92,7 +88,7 @@ get_vault_seal_status () {
     
 }
 
-get_vault_root_token () {
+get_vault_root_token () { # get the root token for vault that is running on the local instance
     if [[ -f $VAULT_ROOT/local-root-token ]]; then
       ROOT_TOKEN=$(cat $VAULT_ROOT/local-root-token)
     else
@@ -101,7 +97,7 @@ get_vault_root_token () {
     echo $ROOT_TOKEN
 }
 
-get_vault_key_share () {
+get_vault_key_share () { # get the key shard/share for the local instance
     if [[ -f $VAULT_ROOT/local-unseal-key ]]; then
       KEY_SHARE=$(cat $VAULT_ROOT/local-unseal-key)
     else
@@ -110,42 +106,40 @@ get_vault_key_share () {
     echo $KEY_SHARE
 }
 
-show_vault_status () {
+show_vault_status () { # submenu to display the status of the valut local enviornment
  
-    echo "${YELLOW}"
-    echo "+----------------------------------------------------------------------"
-    echo "| Server:   $(get_vault_status)"
-    echo "| Sealed:   $(get_vault_seal_status)"
-    echo "| Version:  $(get_vault_version)"
-    echo "| Binary:   $(which vault)"
-    echo "+----------------------------------------------------------------------"
-    echo "| Root Token:  $(get_vault_root_token)"
-    echo "| Key Share:   $(get_vault_key_share)"
-    echo "| API:         http://127.0.0.1:8200/v1/"
-    echo "| UI:          http://127.0.0.1:8200/ui/"
-    echo "| Audit Log:   $VAULT_ROOT/vault-audit.log"
-    echo "| Custom Plugins: $(get_custom_plugins)"
-    echo "+---------------------------------------------------------------------"
+    echo "${YELLOW}"$COLOR_OFF
+    echo "${YELLOW}+----------------------------------------------------------------------"$COLOR_OFF
+    echo "${YELLOW}| Server:   ${DARK_GRAY}$(get_vault_status)"$COLOR_OFF
+    echo "${YELLOW}| Sealed:   ${DARK_GRAY}$(get_vault_seal_status)"$COLOR_OFF
+    echo "${YELLOW}| Version:  ${DARK_GRAY}$(get_vault_version)"$COLOR_OFF
+    echo "${YELLOW}| Binary:   ${DARK_GRAY}$(which vault)"$COLOR_OFF
+    echo "${YELLOW}+----------------------------------------------------------------------"$COLOR_OFF
+    echo "${YELLOW}| Root Token:  ${DARK_GRAY}$(get_vault_root_token)"$COLOR_OFF
+    echo "${YELLOW}| Key Share:   ${DARK_GRAY}$(get_vault_key_share)"$COLOR_OFF
+    echo "${YELLOW}| API:         ${DARK_GRAY}http://127.0.0.1:8200/v1/"$COLOR_OFF
+    echo "${YELLOW}| UI:          ${DARK_GRAY}http://127.0.0.1:8200/ui/"$COLOR_OFF
+    echo "${YELLOW}| Audit Log:   ${DARK_GRAY}$VAULT_ROOT/vault-audit.log"$COLOR_OFF
+    echo "${YELLOW}| Custom Plugin Dir: ${DARK_GRAY}$(get_custom_plugins)"$COLOR_OFF
+    echo "${YELLOW}+---------------------------------------------------------------------"$COLOR_OFF
     echo ""$COLOR_OFF
 }
-get_custom_plugins () {
+get_custom_plugins () { # get a list of installed custom plugins in the custom plugin dier
     PLUGINS=`ls ~/vault/custom_plugin`
     echo "~/vault/custom_plugin : ${PLUGINS}"
 }
-start_vault () {
+start_vault () { # Start vault if it is not already running
     if [[ $(get_vault_status) = "Stopped" ]]; then
         vault server -config=$VAULT_ROOT/config.hcl &
-        sleep 5s
+        sleep 5s  # Wait 5 seconds to give vault time to startup in its new thread
 
-        #/bin/zsh -c "vault server -config=$VAULT_ROOT/config.hcl &"
-        #sleep 5s
         echo "vault started"
     else
         echo "vault is already running"
     fi
 }
 
-stop_vault () {
+stop_vault () { # Stop vault and any running custom plugin threads
     if [[ $(get_vault_status) = "Running" ]]; then
         PROCESS_ID=$(ps -ef | grep '[v]ault server' | awk '{print $2}')
         if [[ ! -z $PROCESS_ID ]]; then
@@ -161,7 +155,7 @@ stop_vault () {
     stop_custom_plugin_processes
 }
 
-stop_custom_plugin_processes() {
+stop_custom_plugin_processes() { # Stop any running custom plugin threads
     PROCESS_IDS=$(ps -ef | grep 'vault/custom_plugin' | awk '{print $2}')
     for PROCESS_ID in PROCESS_IDS
     do
@@ -169,7 +163,7 @@ stop_custom_plugin_processes() {
     done
 }
 
-vault_seal () {
+vault_seal () { # Seal / Lock vault
     if [[ $(get_vault_status) = "Running" ]]; then
         vault operator seal
     else
@@ -178,7 +172,7 @@ vault_seal () {
 
 }
 
-vault_unseal () {
+vault_unseal () { # Unsean / unlock vault
     if [[ $(get_vault_status) = "Running" ]]; then
         UNSEAL_KEY=`cat $VAULT_ROOT/local-unseal-key`
         vault operator unseal $UNSEAL_KEY
@@ -187,10 +181,14 @@ vault_unseal () {
     fi
 }
 
-vault_init () {
+vault_init () { # Initialze vault and save off the shard(s) and root token.
     vault_stop
     vault server -config=$VAULT_ROOT/config.hcl &
     sleep 5s
+
+    # Note: We are saving the shard and root tokens to files for use in running vault locally.
+    # in produciton you need these values but you would not want to persist them in local files
+    # were doing it to support local develpment and running instance of vault.
 
     vault operator init -key-threshold=1 -key-shares=1  2>&1 > $VAULT_ROOT/init.txt
     #FUTURE: have these goto 1Password
@@ -206,7 +204,7 @@ vault_init () {
     vault audit enable file file_path=$VAULT_ROOT/vault-audit.log log_raw=true
 }
 
-vault_delete () {
+vault_delete () { # Delete the current vault data and re-initialze vault
     vault_stop
 
     if [[ -d $VAULT_ROOT/data ]]; then
@@ -219,17 +217,17 @@ vault_delete () {
     vault_init
 }
 
-vault_help () {
+vault_help () { # Display help information
     clear
     echo "${BLUE}"
     echo "+----------------------------------------------------------------------"
-    echo " The Vault Assistent Application Menu helps you to manage a local "
-    echo " Hashicorp open source version of HashiCorp Vault."
+    echo " The ScaleSec Vault Assistant Application Menu helps you to manage a "
+    echo " local instance of the open source version of HashiCorp Vault."
     echo " "
     echo " This assistant menu secript is located: "
     echo " $VAULT_ROOT/assistant/vault-assistant.command"
     echo " "
-    echo " Once you have vault running you can interact with it from a command"
+    echo " Once you have vault running you can also interact with it from a command"
     echo " terminal."
     echo " "
     echo " HashiCorp documents: "
@@ -237,14 +235,17 @@ vault_help () {
     echo " 2.   cli commands https://www.vaultproject.io/docs/commands "
     echo " 3.   api commands https://www.vaultproject.io/api"
     echo " "
-    echo "+---------------------------------------------------------------------"
+    echo "${DARK_GRAY} ScaleSec Vault Assistant:"$COLOR_OFF
+    echo "${LIGHT_GREEN}      https://github.com/ScaleSec/vault-assistant"$COLOR_OFF
+    echo "${BLUE}+---------------------------------------------------------------------"
     echo ""
     echo "${RED}press enter to continue"$COLOR_OFF
     read
 }
 
 #
-# loop and show menu until exit
+#  Main loop to show and process the menu selection.
+#  loop until exit is selected
 #
 LOOP_MENU="true"
 while [[ $LOOP_MENU == "true" ]]; do
@@ -255,8 +256,6 @@ while [[ $LOOP_MENU == "true" ]]; do
         [Ss] ) # start
             echo "start"
             start_vault
-            #echo "$(start_vault)" <-- Doing this version caused the shell to hang
-            #echo "$(vault_unseal)"
         ;;
 
         [Xx] ) # stop
