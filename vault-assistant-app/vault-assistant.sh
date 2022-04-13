@@ -27,7 +27,7 @@ set_colors () { # define colors for text UI
     export BLUE='\x1B[34m'
     export BLACK='\x1B[30m'
     export DARK_GRAY='\x1B[90m'
-    export LIGHT_GREEN='\x1B[92m'
+    export BOLD_GREEN='\x1B[1;32m'
     export RED='\x1B[31m'
     export COLOR_OFF='\x1B[0m'       # Text Reset
 }
@@ -35,21 +35,20 @@ set_colors () { # define colors for text UI
 show_menu () { # displays menu
     clear
 
-    echo "${LIGHT_GREEN}======================================================================="
+    echo "${BOLD_GREEN}======================================================================="
     echo "Vault Assistant Version: $VAULT_ASSISTANT_VERSION"
-    echo "======================================================================="
+    echo "======================================================================="$COLOR_OFF
 
     show_vault_status
 
-    echo " "
     echo "${BLUE}   S - Start Vault Server   ${DARK_GRAY}"$COLOR_OFF
     echo "${BLUE}   X - Stop Vault Server    ${DARK_GRAY}"$COLOR_OFF
     echo "${BLUE}   L - Seal Vault Server    ${DARK_GRAY}Lock / Seal vault"$COLOR_OFF
     echo "${BLUE}   U - Unseal Vault Server  ${DARK_GRAY}"$COLOR_OFF
 
     echo " "
-    echo "${LIGHT_GREEN}   I - Initialize Vault     ${DARK_GRAY}Initializes vault after an install."$COLOR_OFF
-    echo "${LIGHT_GREEN}   D - Delete Vault Data    ${DARK_GRAY}Delete current vault data."$COLOR_OFF
+    echo "${BOLD_GREEN}   I - Initialize Vault     ${DARK_GRAY}Initializes vault after an install."$COLOR_OFF
+    echo "${BOLD_GREEN}   D - Delete Vault Data    ${DARK_GRAY}Delete current vault data."$COLOR_OFF
     echo ""
     echo "${RED}   H - Help                 ${DARK_GRAY}Show help."$COLOR_OFF
     echo "${RED}   E - Exit                 ${DARK_GRAY}Exit Vault Assistant Menu."$COLOR_OFF
@@ -236,7 +235,7 @@ vault_help () { # Display help information
     echo " 3.   api commands https://www.vaultproject.io/api"
     echo " "
     echo "${DARK_GRAY} ScaleSec Vault Assistant:"$COLOR_OFF
-    echo "${LIGHT_GREEN}      https://github.com/ScaleSec/vault-assistant"$COLOR_OFF
+    echo "${BOLD_GREEN}      https://github.com/ScaleSec/vault-assistant"$COLOR_OFF
     echo "${BLUE}+---------------------------------------------------------------------"
     echo ""
     echo "${RED}press enter to continue"$COLOR_OFF
