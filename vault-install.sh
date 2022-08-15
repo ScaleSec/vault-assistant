@@ -123,7 +123,7 @@ download_vault () { # download the current version of vault
 
 install_vault () { # Install vault
     if [[ ! -d /usr/local/vault ]]; then
-        mkdir /usr/local/vault
+        sudo mkdir /usr/local/vault
     fi
     
     sudo chown -R $USER_ID /usr/local/vault
@@ -187,7 +187,7 @@ setup_user_profile () { # setup the users profile file
 }
 
 install_vault_assistant () { # Install the ScaleSec Vault Assistant
-    ./vault_assistant_install.sh
+    ./vault-assistant-install.sh
 }
 
 stop_vault () { # stop vault if it is running.
