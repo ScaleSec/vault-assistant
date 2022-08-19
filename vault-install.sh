@@ -115,7 +115,12 @@ set_vault_version () {
 }
 
 download_vault () { # download the current version of vault
-    export VAULT_ZIP_NAME="vault_"$VAULT_VERSION"_darwin_amd64.zip"
+    if [[ "arm64" == $(uname -m) ]]; then
+        export VAULT_ZIP_NAME="vault_"$VAULT_VERSION"_darwin_amd64.zip"
+    else
+        export VAULT_ZIP_NAME="vault_"$VAULT_VERSION"_darwin_amd64.zip"
+    fi
+
     if [[ ! -f ~/Downloads/$VAULT_ZIP_NAME ]]; then
         curl -o ~/Downloads/$VAULT_ZIP_NAME -k "https://releases.hashicorp.com/vault/"$VAULT_VERSION"/"$VAULT_ZIP_NAME
     fi
