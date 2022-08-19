@@ -106,6 +106,8 @@ set_vault_version () {
         VERSION_LINE=`curl https://releases.hashicorp.com/vault/ | awk 'NR==67' | sed 's/+ent//'`
          OPEN_SOURCE_VERSION_S1=`echo $VERSION_LINE | sed 's/\+ent//g'`
         export OPEN_SOURCE_VERSION_S2=`echo $OPEN_SOURCE_VERSION_S1 | sed 's/\.hsm//g'`
+        # Hashi added a new extension to the files. remove that as well to get latest version
+        export OPEN_SOURCE_VERSION_S2=`echo $OPEN_SOURCE_VERSION_S1 | sed 's/\.fips1402//g'`
         export VAULT_VERSION=`echo $OPEN_SOURCE_VERSION_S2 | cut -f2 -d_ | cut -f1 -d\<`
     else
         export VAULT_VERSION=$REQUESTED_VERSION
