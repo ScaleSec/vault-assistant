@@ -116,7 +116,7 @@ set_vault_version () {
 
 download_vault () { # download the current version of vault
     if [[ "arm64" == $(uname -m) ]]; then
-        export VAULT_ZIP_NAME="vault_"$VAULT_VERSION"_darwin_amd64.zip"
+        export VAULT_ZIP_NAME="vault_"$VAULT_VERSION"_darwin_arm64.zip"
     else
         export VAULT_ZIP_NAME="vault_"$VAULT_VERSION"_darwin_amd64.zip"
     fi
