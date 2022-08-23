@@ -159,9 +159,11 @@ install_vault () { # Install vault
 start_and_init_vault () { # Initilizse and start vault
 
     vault server -config=$VAULT_ROOT/config.hcl &
-    sleep 5s
+    sleep 5
 
     vault operator init -key-threshold=1 -key-shares=1  2>&1 > $VAULT_ROOT/init.txt
+    sleep 5
+    
     #FUTURE: have these goto 1Password
     awk '/^Unseal Key/' $VAULT_ROOT/init.txt | cut -d ' ' -f4 > $VAULT_ROOT/local-unseal-key
     awk '/^Initial Root Token/' $VAULT_ROOT/init.txt | cut -d ' ' -f4 > $VAULT_ROOT/local-root-token
