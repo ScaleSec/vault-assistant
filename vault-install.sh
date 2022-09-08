@@ -106,6 +106,8 @@ set_vault_version () {
         VERSION_LINE=`curl https://releases.hashicorp.com/vault/ | awk 'NR==67' | sed 's/+ent//'`
          OPEN_SOURCE_VERSION_S1=`echo $VERSION_LINE | sed 's/\+ent//g'`
         export OPEN_SOURCE_VERSION_S2=`echo $OPEN_SOURCE_VERSION_S1 | sed 's/\.hsm//g'`
+        # Hashi added a new extension to the files. remove that as well to get latest version
+        export OPEN_SOURCE_VERSION_S2=`echo $OPEN_SOURCE_VERSION_S1 | sed 's/\.fips1402//g'`
         export VAULT_VERSION=`echo $OPEN_SOURCE_VERSION_S2 | cut -f2 -d_ | cut -f1 -d\<`
     else
         export VAULT_VERSION=$REQUESTED_VERSION
@@ -115,7 +117,12 @@ set_vault_version () {
 }
 
 download_vault () { # download the current version of vault
-    export VAULT_ZIP_NAME="vault_"$VAULT_VERSION"_darwin_amd64.zip"
+    if [[ "arm64" == $(uname -m) ]]; then
+        export VAULT_ZIP_NAME="vault_"$VAULT_VERSION"_darwin_arm64.zip"
+    else
+        export VAULT_ZIP_NAME="vault_"$VAULT_VERSION"_darwin_amd64.zip"
+    fi
+
     if [[ ! -f ~/Downloads/$VAULT_ZIP_NAME ]]; then
         curl -o ~/Downloads/$VAULT_ZIP_NAME -k "https://releases.hashicorp.com/vault/"$VAULT_VERSION"/"$VAULT_ZIP_NAME
     fi
@@ -152,9 +159,11 @@ install_vault () { # Install vault
 start_and_init_vault () { # Initilizse and start vault
 
     vault server -config=$VAULT_ROOT/config.hcl &
-    sleep 5s
+    sleep 5
 
     vault operator init -key-threshold=1 -key-shares=1  2>&1 > $VAULT_ROOT/init.txt
+    sleep 5
+    
     #FUTURE: have these goto 1Password
     awk '/^Unseal Key/' $VAULT_ROOT/init.txt | cut -d ' ' -f4 > $VAULT_ROOT/local-unseal-key
     awk '/^Initial Root Token/' $VAULT_ROOT/init.txt | cut -d ' ' -f4 > $VAULT_ROOT/local-root-token
