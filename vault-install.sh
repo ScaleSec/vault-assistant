@@ -103,14 +103,12 @@ cat $VAULT_ROOT/config.hcl
 # get the version of vault reqeusted or the most current version of open source
 set_vault_version () {
     if [[ -z $REQUESTED_VERSION ]]; then
-        VERSION_LINE=`curl https://releases.hashicorp.com/vault/ | awk 'NR==67' | sed 's/+ent//'`
-         OPEN_SOURCE_VERSION_S1=`echo $VERSION_LINE | sed 's/\+ent//g'`
-        export OPEN_SOURCE_VERSION_S2=`echo $OPEN_SOURCE_VERSION_S1 | sed 's/\.hsm//g'`
-        # They added a new extentsion
-        export OPEN_SOURCE_VERSION_S2=`echo $OPEN_SOURCE_VERSION_S1 | sed 's/\.fips1402//g'`
-
-        echo "OPEN_SOURCE_VERSION_S2=" $OPEN_SOURCE_VERSION_S2
-        export VAULT_VERSION=`echo $OPEN_SOURCE_VERSION_S2 | cut -f2 -d_ | cut -f1 -d\<`
+        VERSION_LINE=`curl https://releases.hashicorp.com/vault/ | grep '+ent' | awk 'NR==67'`
+        echo "VERSION_LINE=" $VERSION_LINE
+        # use cut and remove the data to the right of the +ent
+        export OPEN_SOURCE_VERSION_S2=`echo $VERSION_LINE | cut -f1 -d+`
+        # use cut and remove the data to the left of the / that is in front of the verison number we want.
+        export VAULT_VERSION=`echo $OPEN_SOURCE_VERSION_S2 | cut -f3 -d/`
     else
         export VAULT_VERSION=$REQUESTED_VERSION
     fi
